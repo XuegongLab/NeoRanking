@@ -144,9 +144,10 @@ class DataTransformer:
         quartiles = np.quantile(a=x_['rnaseq_TPM'], q=[0.5, 0.75])
         mv = np.where(x_['rnaseq_TPM'] < quartiles[0], 0, 11)
         mv = np.where(x_['rnaseq_TPM'] > quartiles[1], mv, 23)
-        x_['rnaseq_alt_support'] = \
-            x_['rnaseq_alt_support'].fillna(data=pd.Series(mv), index=x_.index)
-
+        #x_['rnaseq_alt_support'] = \
+        #    x_['rnaseq_alt_support'].fillna(data=pd.Series(mv), index=x_.index)
+        x_['rnaseq_alt_support'] = x_['rnaseq_alt_support'].fillna(value=pd.Series(mv)) # (, index=x_.index)
+        
         return x_
 
     def normalize(self, x_):

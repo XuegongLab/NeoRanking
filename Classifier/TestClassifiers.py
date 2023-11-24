@@ -36,6 +36,7 @@ if __name__ == "__main__":
     classifier_model_files = []
     classifier_result_files = []
     for wc in args.classifier_file_re:
+        print(os.path.join(GlobalParameters.classifier_model_dir, args.sub_dir, wc))
         classifier_model_files = \
             classifier_model_files + glob.glob(os.path.join(GlobalParameters.classifier_model_dir, args.sub_dir, wc))
         for classifier_model_file in classifier_model_files:
@@ -43,7 +44,7 @@ if __name__ == "__main__":
             result_file_name = os.path.join(GlobalParameters.classifier_result_dir, args.sub_dir, result_file_name)
             classifier_result_files.append(result_file_name)
             open(result_file_name, mode='w').close()
-
+            print(F'result_file_name={result_file_name}')
 
     def get_clf_mgr(peptide_type: str, dataset_enc: str, classifier_name: str, x: pd.DataFrame):
         alpha = GlobalParameters.neopep_alpha if peptide_type == 'neopep' else GlobalParameters.mutation_alpha
