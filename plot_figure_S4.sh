@@ -1,6 +1,6 @@
 source configure.sh
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d sampling_nr -fn Figure_S4A -re LR_train_all_Gartner_train_200_10000_short_*test.txt LR_train_all_Gartner_train_200_25000_short_*test.txt LR_train_all_Gartner_train_200_50000_short_*test.txt LR_train_all_Gartner_train_200_75000_short_*test.txt LR_train_all_Gartner_train_200_100000_short_09*test.txt LR_train_all_Gartner_train_200_150000_short_09*test.txt LR_train_all_Gartner_train_200_200000_short_09*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'10\'000',1:'25\'000',2:'50\'000',3:'75\'000',4:'100\'000',5:'150\'000',6:'200\'000'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt rank_score -oc cornflowerblue"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d sampling_nr -fn Figure_S4A -re LR_train_all_Gartner_train_200_10000_${SHORT}_*test.txt LR_train_all_Gartner_train_200_25000_${SHORT}_*test.txt LR_train_all_Gartner_train_200_50000_${SHORT}_*test.txt LR_train_all_Gartner_train_200_75000_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_${SHORT}_09*test.txt LR_train_all_Gartner_train_200_150000_${SHORT}_09*test.txt LR_train_all_Gartner_train_200_200000_${SHORT}_09*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'10\'000',1:'25\'000',2:'50\'000',3:'75\'000',4:'100\'000',5:'150\'000',6:'200\'000'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt rank_score -oc cornflowerblue"
 echo $CMD
 eval $CMD
 
@@ -8,11 +8,11 @@ CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py 
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d normalization -fn Figure_S4C -re LR_train_all_Gartner_train_200_100000_0.005_short*test.txt LR_train_all_Gartner_train_200_100000_0.005_p_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_z_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_i_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_n_short_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'quantile',1:'power',2:'z-score',3:'min-max',4:'none'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt rank_score -oc cornflowerblue"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d normalization -fn Figure_S4C -re LR_train_all_Gartner_train_200_100000_0.005_short*test.txt LR_train_all_Gartner_train_200_100000_0.005_p_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_z_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_i_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_n_${SHORT}_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'quantile',1:'power',2:'z-score',3:'min-max',4:'none'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt rank_score -oc cornflowerblue"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d normalization -fn Figure_S4D -re LR_train_all_Gartner_train_200_100000_0.005_short*test.txt LR_train_all_Gartner_train_200_100000_0.005_p_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_z_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_i_short_*test.txt LR_train_all_Gartner_train_200_100000_0.005_n_short_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'quantile',1:'power',2:'z-score',3:'min-max',4:'none'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt topn_counts -oc cornflowerblue"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d normalization -fn Figure_S4D -re LR_train_all_Gartner_train_200_100000_0.005_short*test.txt LR_train_all_Gartner_train_200_100000_0.005_p_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_z_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_i_${SHORT}_*test.txt LR_train_all_Gartner_train_200_100000_0.005_n_${SHORT}_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'quantile',1:'power',2:'z-score',3:'min-max',4:'none'}\" -a 0.02 -las 30 -tis 20 -rot 30 -tts 25 -ttp \"LR, \" -ds NCI_train -plt topn_counts -oc cornflowerblue"
 echo $CMD
 eval $CMD
 
@@ -44,19 +44,19 @@ eval $CMD
 #echo $CMD
 #eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d ipmsdb_intogen_contribution -fn Figure_S4L -re LR_train_all*_short_*test.txt LR_train_noMS_*_short_*test.txt LR_train_noINT*_short_*test.txt LR_train_noMSINT*_short_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'ALL',1:'No ipMSDB',2:'No Intogen',3:'No ipMSDB & Intogen'}\" -a 0.02 -rot 75 -las 30 -tis 18 -les 15 -sr -ds NCI_test -plt rank_score -oc cornflowerblue"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d ipmsdb_intogen_contribution -fn Figure_S4L -re LR_train_all*_${SHORT}_*test.txt LR_train_noMS_*_${SHORT}_*test.txt LR_train_noINT*_${SHORT}_*test.txt LR_train_noMSINT*_${SHORT}_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'ALL',1:'No ipMSDB',2:'No Intogen',3:'No ipMSDB & Intogen'}\" -a 0.02 -rot 75 -las 30 -tis 18 -les 15 -sr -ds NCI_test -plt rank_score -oc cornflowerblue"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -fn Figure_S4N -re LR_*_long_*test.txt XGBoost_*_long_*test.txt Voting_classifier_0.50_long_test.txt -pt mutation -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'LR',1:'XGBoost',2:'Voting'}\" -a 0.02 -rot 30 -las 30 -tis 18 -les 15 -sr -o \"LR,XGBoost,Voting\" -ds TESLA -plt topn_counts"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -fn Figure_S4N -re LR_*_${LONG}_*test.txt XGBoost_*_${LONG}_*test.txt Voting_classifier_0.50_${LONG}_test.txt -pt mutation -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'LR',1:'XGBoost',2:'Voting'}\" -a 0.02 -rot 30 -las 30 -tis 18 -les 15 -sr -o \"LR,XGBoost,Voting\" -ds TESLA -plt topn_counts"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -fn Figure_S4M -re LR_*_long_*test.txt XGBoost_*_long_*test.txt Voting_classifier_0.50_long_test.txt -pt mutation -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'LR',1:'XGBoost',2:'Voting'}\" -a 0.02 -rot 30 -las 30 -tis 18 -les 15 -sr -o \"LR,XGBoost,Voting\" -ds HiTIDE -plt topn_counts"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -fn Figure_S4M -re LR_*_${LONG}_*test.txt XGBoost_*_${LONG}_*test.txt Voting_classifier_0.50_${LONG}_test.txt -pt mutation -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'LR',1:'XGBoost',2:'Voting'}\" -a 0.02 -rot 30 -las 30 -tis 18 -les 15 -sr -o \"LR,XGBoost,Voting\" -ds HiTIDE -plt topn_counts"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d ipmsdb_intogen_contribution -fn Figure_S4O -re LR_train_all*_long_*test.txt LR_train_noMS_*_long_*test.txt LR_train_noINT*_long_*test.txt LR_train_noMSINT*_long_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'ALL',1:'No ipMSDB',2:'No Intogen',3:'No ipMSDB & Intogen'}\" -a 0.02 -rot 75 -las 30 -tis 18 -les 15 -sr -ds NCI_test -plt rank_score -oc cornflowerblue"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py -d ipmsdb_intogen_contribution -fn Figure_S4O -re LR_train_all*_${LONG}_*test.txt LR_train_noMS_*_${LONG}_*test.txt LR_train_noINT*_${LONG}_*test.txt LR_train_noMSINT*_${LONG}_*test.txt -pt neopep -g \"{'TESLA':'TESLA','HiTIDE':'HiTIDE','NCI_test':'NCI-test','NCI_train':'NCI-train'}\" -cln \"{0:'ALL',1:'No ipMSDB',2:'No Intogen',3:'No ipMSDB & Intogen'}\" -a 0.02 -rot 75 -las 30 -tis 18 -les 15 -sr -ds NCI_test -plt rank_score -oc cornflowerblue"
 echo $CMD
 eval $CMD
 
