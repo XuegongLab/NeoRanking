@@ -104,7 +104,7 @@ if __name__ == "__main__":
 
     for j, regexp in enumerate(args.clf_result_files_re):
         clf_result_files = glob.glob(os.path.join(GlobalParameters.classifier_result_dir, args.sub_dir, regexp))
-
+        print(F'clf_result_files={clf_result_files} from REGEX={os.path.join(GlobalParameters.classifier_result_dir, args.sub_dir, regexp)}')
         for i, clf_result_file in enumerate(clf_result_files):
             if os.path.getsize(clf_result_file) > 0:
                 print(clf_result_file)

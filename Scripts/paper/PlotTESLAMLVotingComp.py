@@ -30,6 +30,7 @@ if __name__ == "__main__":
 
     tesla_score_file = os.path.join(GlobalParameters.classifier_result_dir, args.sub_dir, args.tesla_score_file)
     if os.path.isfile(tesla_score_file):
+        print(F'The tesla_score_file={tesla_score_file}, it does exist. ')
         # values if you create your own tesla score file
         tesla_scores = pd.read_csv(tesla_score_file, sep='\t', header=0)
         idx = tesla_scores.Patient.apply(lambda p: p in {'TESLA1', 'TESLA2', 'TESLA3', 'TESLA12', 'TESLA16'})
