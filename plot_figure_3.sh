@@ -16,15 +16,15 @@ CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotClassifierResults.py 
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_test.txt -fn Figure_3D -ft pdf -pt FR_plot"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_tesla_score.txt -fn Figure_3D -ft pdf -pt FR_plot"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_test.txt -fn Figure_3E -ft pdf -pt TTIF_plot"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_tesla_score.txt -fn Figure_3E -ft pdf -pt TTIF_plot"
 echo $CMD
 eval $CMD
 
-CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_test.txt -fn Figure_3F -ft pdf -pt AUPRC_plot"
+CMD="PYTHONPATH=$NEORANKING_CODE python3 Scripts/paper/PlotTESLAMLVotingComp.py -tsf Voting_classifier_${SHORT}_0.50_tesla_score.txt -fn Figure_3F -ft pdf -pt AUPRC_plot"
 echo $CMD
 eval $CMD
 
