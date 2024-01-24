@@ -10,6 +10,9 @@ from Utils.GlobalParameters import *
 
 warnings.filterwarnings(action='ignore', category=UserWarning)
 
+#import sys
+#sys.path.append('/mnt/d/code/neoheadhunter') # (os.path.dirname(os.path.realpath(__file__)))
+#from IsotonicLogisticRegression import IsotonicLogisticRegression
 
 class CatEncoder:
 
@@ -42,6 +45,11 @@ class CatEncoder:
 
             for l in tot_cnt:
                 self.float_encoding[l] /= s
+
+            #ilr = IsotonicLogisticRegression()
+            #k2v = ilr.encode1d(x, y)
+            #for l in k2v:
+            #    self.float_encoding[l] = k2v[l]
 
             self.unknown_float_code = 0.0
 
