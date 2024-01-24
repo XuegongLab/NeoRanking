@@ -108,7 +108,7 @@ class GlobalParameters:
     nr_hyperopt_rep = 10
     nr_hyperopt_iter = 200
     nr_hyperopt_cv = 5
-    normalizer: Final[str] = 'q'
+    normalizer: Final[str] = '1' # 'q'
     nr_non_immuno_neopeps: Final[int] = 100000
     cat_type: Final[str] = 'float'  # either float or int
     max_netmhc_rank: Final[int] = 20

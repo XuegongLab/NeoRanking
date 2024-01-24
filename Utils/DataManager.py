@@ -9,6 +9,12 @@ from DataWrangling.DataTransformer import DataTransformer
 from Utils.GlobalParameters import *
 from Utils.Util_fct import *
 
+import sys
+# TODO: please change this to the directory that contains the IsotonicLogisticRegression python module 
+#   (for example, os.path.dirname(os.path.realpath(__file__))+(os.path.sep)+'..')
+ISO_DIR = '/mnt/d/code/neoguider' # LINE_TO_BE_CHANGED_A
+sys.path.append(ISO_DIR)
+from IsotonicLogisticRegression import IsotonicLogisticRegression
 
 class DataManager:
     """
@@ -366,6 +372,25 @@ class DataManager:
                     combined_X = pd.concat([combined_X, X_p], ignore_index=True)
                 combined_y = np.append(combined_y, y_p)
 
+        if GlobalParameters.normalizer == '1' and data_transformer.objective == 'ml':
+
+            if peptide_type == 'mutation':
+                ml_features = GlobalParameters.ml_features_mutation
+            elif peptide_type == 'neopep':
+                ml_features = GlobalParameters.ml_features_neopep
+
+            all_X = combined_X.loc[:,ml_features]
+            train_X = combined_X.loc[(combined_df['train_test'] == 'train'),ml_features]
+            print(F'Selected {len(train_X)} out of {len(all_X)} rows. ')
+            train_y = combined_y[(combined_df['train_test'] == 'train')]
+            print(F'Selected {len(train_y)} out of {len(combined_y)} rows. ')
+            ilr = IsotonicLogisticRegression()
+            ilr.fit(train_X, train_y) # is_centered=True, is_log=True
+            print(all_X)
+            print(train_X)
+            trans_X = ilr.transform(all_X)
+            trans_X = pd.DataFrame(data = trans_X, columns = all_X.columns)
+            for ml_feature in ml_features: combined_X.loc[:,ml_feature] = trans_X[ml_feature]
         return combined_df, combined_X, combined_y
 
     @staticmethod

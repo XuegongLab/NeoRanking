@@ -45,7 +45,7 @@ def get_processed_types(peptide_type: str, objective: str):
         if peptide_type == 'neopep':
             type_dict = \
                 {feature: 'float' for feature in GlobalParameters.ml_features_neopep}
-            type_dict['seq_len'] = 'int'
+            #type_dict['seq_len'] = 'int'
             return type_dict
         elif peptide_type == 'mutation':
             type_dict = \
