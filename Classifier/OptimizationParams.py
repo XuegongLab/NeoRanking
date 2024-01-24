@@ -75,14 +75,18 @@ class OptimizationParams:
         elif classifier_tag == "LR":
 
             parameter_space = {
-                'penalty': hp.choice('penalty', ['l1', 'l2']),
+                'penalty': hp.choice('penalty', [None, 'l1', 'l2']),
                 'C': hp.uniform('C', 0.0, 5.0),
                 'class_weight': self.get_class_weights()
             }
         elif classifier_tag == "XGBoost":
 
             parameter_space = {
-                'booster': hp.choice('booster', ['gbtree', 'gblinear']),
+                # The gblinear is removed because
+                #   GBLinear: Inplace predict is not supported by current booster.
+                # (referenced at https://github.com/dmlc/xgboost/issues/9110 and https://github.com/SeldonIO/MLServer/issues/1123)
+                # 'booster': hp.choice('booster', ['gbtree', 'gblinear']),
+                'booster': hp.choice('booster', ['gbtree']),
                 'max_depth': hp.choice('max_depth', [3, 4, 5, 7, 9]),
                 'min_child_weight': hp.choice('min_child_weight', np.round(np.arange(0.0,  0.2, 0.01), 5)),
                 'learning_rate': hp.loguniform('learning_rate', np.log(0.01), np.log(0.1)),
