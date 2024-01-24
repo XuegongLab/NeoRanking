@@ -1,3 +1,15 @@
+# Priorization of neoantigens by machine learning with feature normalization based on isotonic regression
+
+This repository has been forked from https://github.com/bassanilab/NeoRanking
+and modified to evaluate the neoantigen-feature normalization technique based on isotonic regression.
+We proposed this technique to linearize features in log-odds space. 
+
+To run the code in this repo, 
+please change the ISO_DIR variable in the file Utils/DataManager.py and then run according to the procedures described at https://github.com/bassanilab/NeoRanking
+
+
+-------- The content below this line is copied from https://github.com/bassanilab/NeoRanking --------
+
 # Priorization of neoantigens by machine learning
 
 ## Introduction
