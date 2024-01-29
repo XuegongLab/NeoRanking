@@ -68,7 +68,11 @@ def run_training(run_index):
 
         param_file.write('Training dataset: {0} (with {1} positive examples out of {2} examples)\n'.format(args.dataset_train, sum(y_train), len(X_train)))
         param_file.write('Saved to {0:s}\n'.format(clf_model_file))
-        X_train.to_csv('{}.csv'.format(clf_param_file))
+        if len(X_train) <= 50:
+            X_train.to_csv('{}.full.csv'.format(clf_param_file))
+        else:
+            X_idxs = list(range(10)) + list(range(len(X_train)-10, len(X_train)))
+            X_train.iloc[X_idxs,:].to_csv('{}.head10-tail10.csv'.format(clf_param_file))
 
 if __name__ == "__main__":
 
