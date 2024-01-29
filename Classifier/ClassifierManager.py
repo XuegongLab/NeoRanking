@@ -371,7 +371,7 @@ class ClassifierManager:
         """
 
         if classifier_tag in ['CatBoost', 'XGBoost']:
-            classifier = optimization_params.get_base_classifier(classifier_tag, self._seed)
+            classifier = optimization_params.get_base_classifier(classifier_tag)
             classifier.load_model(classifier_file)
         else:
             classifier = pickle.load(open(classifier_file, 'rb'))
