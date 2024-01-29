@@ -15,10 +15,12 @@ parser.add_argument('-o', '--objective', type=str, choices=GlobalParameters.obje
                     help='Objective for normalization (ml or plot)')
 parser.add_argument('-i', '--isopath', type=str,
                     help='Path to the isotonic regression python source-code file. ')
+parser.add_argument('-s', '--seed', type=int, default=42,
+                    help='Pseudo-random number generator (PRNG) seed. ')
 
 if __name__ == "__main__":
     args = parser.parse_args()
     if args.isopath.lower() in ['.', 'na', 'n/a', 'n.a', 'n.a.']: args.isopath = ''
     print(args)
-    DataManager.transform_data(args.peptide_type, args.dataset, args.objective, args.isopath)
+    DataManager.transform_data(args.peptide_type, args.dataset, args.objective, args.isopath, args.seed)
 

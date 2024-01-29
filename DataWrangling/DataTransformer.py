@@ -176,9 +176,9 @@ class DataTransformer:
         return x_
 
     @staticmethod
-    def get_normalizer_(normalizer_tag):
+    def get_normalizer_(normalizer_tag, seed):
         if normalizer_tag == 'q':
-            return QuantileTransformer()
+            return QuantileTransformer(random_state=seed)
         elif normalizer_tag == 'z':
             return StandardScaler()
         elif normalizer_tag == 'p':
@@ -194,15 +194,15 @@ class DataTransformer:
         elif normalizer_tag == 'plot':
             d = {}
             for k, v in GlobalParameters.plot_normalization.items():
-                d[k] = DataTransformer.get_normalizer_(v)
+                d[k] = DataTransformer.get_normalizer_(v, seed)
             return d
 
     @staticmethod
-    def get_normalizer(objective):
+    def get_normalizer(objective, seed):
         if objective == 'ml':
-            return DataTransformer.get_normalizer_(GlobalParameters.normalizer)
+            return DataTransformer.get_normalizer_(GlobalParameters.normalizer, seed)
         elif objective == 'plot':
-            return DataTransformer.get_normalizer_('plot')
+            return DataTransformer.get_normalizer_('plot', seed)
         else:
             return None
 

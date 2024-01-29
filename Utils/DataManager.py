@@ -407,7 +407,7 @@ class DataManager:
         return combined_df, combined_X, combined_y
 
     @staticmethod
-    def transform_data(peptide_type: str, dataset: str, objective: str, isopath: str) -> None:
+    def transform_data(peptide_type: str, dataset: str, objective: str, isopath: str, seed: int) -> None:
         """
         Transforms data by encoding categorical values, normalizing numerical values, and imputing missing values.
         These operations are performed separately for each patient in all datasets. Stores the transformed data matrix
@@ -419,7 +419,7 @@ class DataManager:
             objective (str): either machine learning ('ml') or plotting ('plot')
 
         """
-        data_transformer = DataTransformer(peptide_type, objective, dataset, DataTransformer.get_normalizer(objective))
+        data_transformer = DataTransformer(peptide_type, objective, dataset, DataTransformer.get_normalizer(objective, seed))
         data, X, y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, isopath=isopath)
         ml_sel_data_file_name, norm_data_file_name = DataManager._get_processed_data_files(peptide_type, objective)
         X.to_csv(norm_data_file_name, sep='\t', header=True, index=False)
