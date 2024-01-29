@@ -115,7 +115,7 @@ class OptimizationParams:
 
         return parameter_space
 
-    def get_classifier(self, classifier_tag: str, params: dict):
+    def get_classifier(self, classifier_tag: str, params: dict, classifier_creation_seed: int = 0):
         """
         Creates classifier object with hyperparameters corresponding to params
 
@@ -148,7 +148,7 @@ class OptimizationParams:
                 leaf_estimation_iterations=params['leaf_estimation_iterations'],
                 depth=params['depth'],
                 bagging_temperature=params['bagging_temperature'],
-                random_seed=42,
+                random_seed=classifier_creation_seed+42,
                 use_best_model=False,
                 cat_features=self.cat_idx,
                 auto_class_weights=params['auto_class_weights'],
@@ -180,10 +180,10 @@ class OptimizationParams:
                 reg_lambda=1,
                 scale_pos_weight=params['scale_pos_weight'],
                 base_score=0.5,
-                random_state=0,
-                seed=None)
+                random_state=classifier_creation_seed,
+                seed=classifier_creation_seed)
 
-    def get_base_classifier(self, classifier_tag):
+    def get_base_classifier(self, classifier_tag, classifier_creation_seed: int = 0):
         """
         Creates classifier object with default hyperparameters
 
@@ -207,7 +207,7 @@ class OptimizationParams:
                 loss_function='Logloss',
                 iterations=10,
                 learning_rate=0.01,
-                random_seed=42,
+                random_seed=classifier_creation_seed+42,
                 logging_level='Silent',
                 use_best_model=False,
                 cat_features=self.cat_idx,
@@ -240,8 +240,8 @@ class OptimizationParams:
                 reg_lambda=1,
                 scale_pos_weight=1,
                 base_score=0.5,
-                random_state=0,
-                seed=42) # from seed=None
+                random_state=classifier_creation_seed,
+                seed=classifier_creation_seed) # from seed=None
             return clf_xgb
 
     def get_scorer(self, scorer_name: str, data: pd.DataFrame):

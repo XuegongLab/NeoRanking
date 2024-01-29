@@ -44,7 +44,7 @@ class ClassifierManager:
         self._classifier_tag: str = classifier_tag
         self._optimization_params: OptimizationParams = optimization_params
         # classifier with sklearn interface
-        self._classifier = self._optimization_params.get_base_classifier(self._classifier_tag)
+        self._classifier = self._optimization_params.get_base_classifier(self._classifier_tag, random_seed+101)
         # scorer returning single float value resulting from sklearn.metrics.make_scorer function
         self._classifier_scorer = None
         self._scorer_name: str = scorer_name
@@ -313,7 +313,7 @@ class ClassifierManager:
         if params is None:
             clf = classifier
         else:
-            clf = self._optimization_params.get_classifier(self._classifier_tag, params)
+            clf = self._optimization_params.get_classifier(self._classifier_tag, params, self._seed+102)
 
         if self._classifier_tag == 'CatBoost':
             clf.fit(x, y, plot=False)
@@ -371,7 +371,7 @@ class ClassifierManager:
         """
 
         if classifier_tag in ['CatBoost', 'XGBoost']:
-            classifier = optimization_params.get_base_classifier(classifier_tag)
+            classifier = optimization_params.get_base_classifier(classifier_tag, self._seed)
             classifier.load_model(classifier_file)
         else:
             classifier = pickle.load(open(classifier_file, 'rb'))
