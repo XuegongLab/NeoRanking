@@ -15,4 +15,3 @@ if __name__ == "__main__":
 
     DataManager.select_ml_data(args.peptide_type)
 
-

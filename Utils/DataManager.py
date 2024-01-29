@@ -1,3 +1,4 @@
+import logging
 import random
 import numpy as np
 import pandas as pd
@@ -9,12 +10,7 @@ from DataWrangling.DataTransformer import DataTransformer
 from Utils.GlobalParameters import *
 from Utils.Util_fct import *
 
-import sys
-# TODO: please change this to the directory that contains the IsotonicLogisticRegression python module 
-#   (for example, os.path.dirname(os.path.realpath(__file__))+(os.path.sep)+'..')
-ISO_DIR = '/mnt/d/code/neoguider' # LINE_TO_BE_CHANGED_A
-sys.path.append(ISO_DIR)
-from IsotonicLogisticRegression import IsotonicLogisticRegression
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 class DataManager:
     """
@@ -213,7 +209,7 @@ class DataManager:
     @staticmethod
     def filter_processed_data(peptide_type: str, objective: str, patient: str = "", dataset: str = "",
                               response_types: list = GlobalParameters.response_types, sample: bool = True,
-                              shuffle: bool = False) -> tuple:
+                              shuffle: bool = False, seed: int = 42) -> tuple:
         """
         Function that returns the data matrix for neo-peptides or mutations after normalization and missing value
         imputation. The data matrix can be filtered by patient, dataset, and response_type. The original complete
@@ -247,9 +243,9 @@ class DataManager:
             y = y[idx]
 
         if sample:
-            data, X, y = DataManager._sample_rows(data=data, X=X, y=y)
+            data, X, y = DataManager._sample_rows(data=data, X=X, y=y, seed=seed)
         elif shuffle:
-            data, X, y = DataManager._shuffle_rows(data=data, X=X, y=y)
+            data, X, y = DataManager._shuffle_rows(data=data, X=X, y=y, seed=seed)
 
         return data, X, y
 
@@ -291,11 +287,12 @@ class DataManager:
         return df1, df2
 
     @staticmethod
-    def _sample_rows(data, X, y) -> tuple:
+    def _sample_rows(data, X, y, seed) -> tuple:
         if sum(y == 0) < GlobalParameters.nr_non_immuno_neopeps:
             return data, X, y
-
-        idx = random.sample(range(sum(y == 0)), GlobalParameters.nr_non_immuno_neopeps)
+        local_random = random.Random()
+        local_random.seed(seed+12)
+        idx = local_random.sample(range(sum(y == 0)), GlobalParameters.nr_non_immuno_neopeps)
         X_1 = X.loc[y == 1, :]
         X_0 = X.loc[y == 0, :]
         if X_0.shape[0] > GlobalParameters.nr_non_immuno_neopeps:
@@ -316,9 +313,10 @@ class DataManager:
         return data_s, X_s, y_s
 
     @staticmethod
-    def _shuffle_rows(data, X, y) -> tuple:
-
-        idx = random.sample(range(len(y)), k=len(y))
+    def _shuffle_rows(data, X, y, seed) -> tuple:
+        local_random = random.Random()
+        local_random.seed(seed+11)
+        idx = local_random.sample(range(len(y)), k=len(y))
         X_s = X.iloc[idx, :]
         data_s = data.iloc[idx, :]
         y_s = y[idx]
@@ -350,16 +348,17 @@ class DataManager:
         return patient in DataManager._immunogenic_patients[peptide_type]
 
     @staticmethod
-    def _transform_data_(peptide_type: str, data_transformer: DataTransformer) \
+    def _transform_data_(peptide_type: str, data_transformer: DataTransformer, isopath: str) \
             -> pd.DataFrame:
         data = DataManager.load_ml_selected_data(peptide_type=peptide_type)
         patients = data['patient'].unique()
         DataManager._immunogenic_patients[peptide_type] = []
         for i, p in enumerate(patients):
-            print("processing patient {0}".format(p))
+            #print("processing patient {0}".format(p))
             data_p = \
                 DataManager.load_filter_data(peptide_type=peptide_type, patient=p, ml_row_selection=True)
-            data_p, X_p, y_p = data_transformer.apply(data_p)
+            data_p, X_p, y_p = data_transformer.apply(data_p, isopath)
+            print("Extracted {0} out of {1} records for patient {2}".format(len(data_p), len(data), p))
             if i == 0:
                 combined_df = data_p
                 combined_X = X_p
@@ -371,9 +370,9 @@ class DataManager:
                     combined_X, X = DataManager._combine_categories(combined_X, X_p)
                     combined_X = pd.concat([combined_X, X_p], ignore_index=True)
                 combined_y = np.append(combined_y, y_p)
-
-        if GlobalParameters.normalizer == '1' and data_transformer.objective == 'ml':
-
+        print("Extracted {0} out of {1} records for all patients".format(len(combined_df), len(data)))
+        #if GlobalParameters.normalizer == '1' and data_transformer.objective == 'ml':
+        if isopath and data_transformer.objective == 'ml':
             if peptide_type == 'mutation':
                 ml_features = GlobalParameters.ml_features_mutation
             elif peptide_type == 'neopep':
@@ -381,11 +380,25 @@ class DataManager:
 
             all_X = combined_X.loc[:,ml_features]
             train_X = combined_X.loc[(combined_df['train_test'] == 'train'),ml_features]
-            print(F'Selected {len(train_X)} out of {len(all_X)} rows. ')
+            logging.info(F'Selected {len(train_X)} out of {len(all_X)} rows. ')
             train_y = combined_y[(combined_df['train_test'] == 'train')]
-            print(F'Selected {len(train_y)} out of {len(combined_y)} rows. ')
-            ilr = IsotonicLogisticRegression()
+            logging.info(F'Selected {len(train_y)} out of {len(combined_y)} rows. ')
+
+            import os, sys
+            ISO_DIR = os.path.dirname(isopath)
+            ISO_NAME = os.path.basename(isopath)
+            ISO_MODULE, ISO_EXT = os.path.splitext(ISO_NAME)
+            # TODO: please change this to the directory that contains the IsotonicLogisticRegression python module
+            #   (for example, os.path.dirname(os.path.realpath(__file__))+(os.path.sep)+'..')
+            # ISO_DIR = '/mnt/d/code/neoguider' # LINE_TO_BE_CHANGED_A
+            sys.path.append(ISO_DIR)
+            IsotonicLogisticRegression = __import__(ISO_MODULE)
+            #from IsotonicLogisticRegression import IsotonicLogisticRegression
+            os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.${peptide_type}.{ISO_NAME}.py')
+            ilr = IsotonicLogisticRegression.IsotonicLogisticRegression()
+            logging.info(F'Start fitting ILR')
             ilr.fit(train_X, train_y) # is_centered=True, is_log=True
+            logging.info(F'End fitting ILR')
             print(all_X)
             print(train_X)
             trans_X = ilr.transform(all_X)
@@ -394,7 +407,7 @@ class DataManager:
         return combined_df, combined_X, combined_y
 
     @staticmethod
-    def transform_data(peptide_type: str, dataset: str, objective: str) -> None:
+    def transform_data(peptide_type: str, dataset: str, objective: str, isopath: str) -> None:
         """
         Transforms data by encoding categorical values, normalizing numerical values, and imputing missing values.
         These operations are performed separately for each patient in all datasets. Stores the transformed data matrix
@@ -407,7 +420,7 @@ class DataManager:
 
         """
         data_transformer = DataTransformer(peptide_type, objective, dataset, DataTransformer.get_normalizer(objective))
-        data, X, y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer)
+        data, X, y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, isopath=isopath)
         ml_sel_data_file_name, norm_data_file_name = DataManager._get_processed_data_files(peptide_type, objective)
         X.to_csv(norm_data_file_name, sep='\t', header=True, index=False)
         data.to_csv(ml_sel_data_file_name, sep='\t', header=True, index=False)

@@ -23,6 +23,7 @@ warnings.filterwarnings(action='ignore', category=UndefinedMetricWarning)
 warnings.filterwarnings(action='ignore', category=UserWarning)
 warnings.filterwarnings(action='ignore', category=RuntimeWarning)
 
+import random
 
 class ClassifierManager:
 
@@ -75,14 +76,16 @@ class ClassifierManager:
 
         if self._classifier_tag in ['SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost']:
 
+            random.seed(self._seed+3)
+            np.random.seed(self._seed+2)
             trials = Trials()  # Initialize an empty trials database for further saving/loading ran iteractions
 
             start = time.time()
 
             objective = OptimizationObjective(optimization_params=self._optimization_params,
                                               classifier_tag=self._classifier_tag, x=x, y=y,
-                                              metric=self._classifier_scorer)
-
+                                              metric=self._classifier_scorer, seed=self._seed+1)
+            # https://stackoverflow.com/questions/53794176/hyperopt-optimal-parameter-changing-with-rerun
             best = fmin(objective.score,
                         space=param_space,
                         algo=tpe.suggest,

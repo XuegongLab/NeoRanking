@@ -24,18 +24,18 @@ class DataTransformer:
 
         return
 
-    def apply(self, data: pd.DataFrame) -> list:
+    def apply(self, data: pd.DataFrame, isopath: str) -> list:
         if data is None or data.shape[0] == 0:
             return None, None, None
 
         if self.peptide_type == 'mutation':
-            return self.load_patient_mutation(data)
+            return self.load_patient_mutation(data, isopath)
         elif self.peptide_type == 'neopep':
-            return self.load_patient_neopep(data)
+            return self.load_patient_neopep(data, isopath)
         else:
             return None, None, None
 
-    def load_patient_mutation(self, df):
+    def load_patient_mutation(self, df, isopath: str):
         if df.shape[0] == 0:
             return None, None, None
 
@@ -48,7 +48,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        X = self.normalize(X)
+        if not isopath: X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)
@@ -57,7 +57,7 @@ class DataTransformer:
 
         return df, X, y
 
-    def load_patient_neopep(self, df):
+    def load_patient_neopep(self, df, isopath: str):
         if df.shape[0] == 0:
             return None, None, None
 
@@ -70,7 +70,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        X = self.normalize(X)
+        if not isopath: X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)
@@ -151,9 +151,6 @@ class DataTransformer:
         return x_
 
     def normalize(self, x_):
-        if self.normalizer is None:
-            return x_
-
         for i, c in enumerate(x_.columns):
             if is_cont_type(x_[c].dtype.name):
                 if type(self.normalizer) is dict:

@@ -241,7 +241,7 @@ class OptimizationParams:
                 scale_pos_weight=1,
                 base_score=0.5,
                 random_state=0,
-                seed=None)
+                seed=42) # from seed=None
             return clf_xgb
 
     def get_scorer(self, scorer_name: str, data: pd.DataFrame):
@@ -321,7 +321,7 @@ class OptimizationParams:
 class OptimizationObjective:
 
     def __init__(self, optimization_params: OptimizationParams, classifier_tag: str, x: pd.DataFrame, y: np.ndarray,
-                 shuffle: bool = True, metric: str = 'sum_exp_rank'):
+                 shuffle: bool = True, metric: str = 'sum_exp_rank', seed: int=42):
         """
         Class defining Hyperopt classifier optimization score function
 
@@ -336,7 +336,10 @@ class OptimizationObjective:
         self.optimization_params = optimization_params
         self.classifier_tag = classifier_tag
         self.shuffle = shuffle
-        self.stratifiedKFold = StratifiedKFold(n_splits=GlobalParameters.nr_hyperopt_cv, shuffle=self.shuffle)
+        if self.shuffle:
+            self.stratifiedKFold = StratifiedKFold(n_splits=GlobalParameters.nr_hyperopt_cv, shuffle=True, random_state=seed)
+        else:
+            self.stratifiedKFold = StratifiedKFold(n_splits=GlobalParameters.nr_hyperopt_cv, shuffle=False)
         self.best_loss = np.Inf
         self.best_classifier = None
         self.best_params = None

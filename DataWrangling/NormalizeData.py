@@ -13,10 +13,12 @@ parser.add_argument('-ds', '--dataset', type=str, choices=GlobalParameters.datas
                     help='Dataset used for encoding (NCI_train or NCI)')
 parser.add_argument('-o', '--objective', type=str, choices=GlobalParameters.objectives,
                     help='Objective for normalization (ml or plot)')
+parser.add_argument('-i', '--isopath', type=str,
+                    help='Path to the isotonic regression python source-code file. ')
 
 if __name__ == "__main__":
     args = parser.parse_args()
-
-    DataManager.transform_data(args.peptide_type, args.dataset, args.objective)
-
+    if args.isopath.lower() in ['.', 'na', 'n/a', 'n.a', 'n.a.']: args.isopath = ''
+    print(args)
+    DataManager.transform_data(args.peptide_type, args.dataset, args.objective, args.isopath)
 

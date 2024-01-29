@@ -16,6 +16,7 @@ parser.add_argument('-d', '--sub_dir', default='', type=str, help='Subdirectory 
 parser.add_argument('-pt', '--peptide_type', type=str, choices=GlobalParameters.peptide_types,
                     help='Peptide type (mutation  or neopep)')
 parser.add_argument('-tag', '--run_tag', type=str, help='Tag used in output file')
+parser.add_argument('-s', '--seed', type=int, default=42, help='Seed for pseudo-random number generator')
 
 
 def run_training(run_index):
@@ -35,7 +36,7 @@ def run_training(run_index):
                                cat_idx=DataManager.get_categorical_feature_idx(peptide_type, x),
                                class_ratio=class_ratio)
 
-        random_seed = 42+run_index*997
+        random_seed = args.seed+(run_index)*997*1
         return ClassifierManager(classifier_name, 'sum_exp_rank', optimizationParams, verbose=0,
                                  random_seed=random_seed)
 
@@ -52,7 +53,7 @@ def run_training(run_index):
         data_train, X_train, y_train = \
             DataManager.filter_processed_data(peptide_type=args.peptide_type, objective='ml',
                                               response_types=response_types,
-                                              dataset=args.dataset_train, sample=args.peptide_type == 'neopep')
+                                              dataset=args.dataset_train, sample=args.peptide_type == 'neopep', seed=args.seed+1+(run_index)*997*1)
         clf_mgr = get_clf_mgr(args.peptide_type, args.dataset_train, args.classifier, X_train, y_train,
                               run_index=run_index)
 
@@ -65,9 +66,9 @@ def run_training(run_index):
         print('Classifier = {0:s}, run index = {1:d}\nBest training params: {2:s}\nsum_exp_rank = {3:.3f}\nSaved to {4:s}'.
               format(args.classifier, run_index, str(best_params), best_score, clf_model_file))
 
-        param_file.write('Training dataset: {0}\n'.format(args.dataset_train))
+        param_file.write('Training dataset: {0} (with {1} positive examples out of {2} examples)\n'.format(args.dataset_train, sum(y_train), len(X_train)))
         param_file.write('Saved to {0:s}\n'.format(clf_model_file))
-
+        X_train.to_csv('{}.csv'.format(clf_param_file))
 
 if __name__ == "__main__":
 
