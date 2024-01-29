@@ -48,7 +48,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        if not isopath: X = self.normalize(X)
+        if not isopath or self.objective != 'ml': X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)
@@ -70,7 +70,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        if not isopath: X = self.normalize(X)
+        if not isopath or self.objective != 'ml': X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)
@@ -147,10 +147,13 @@ class DataTransformer:
         #x_['rnaseq_alt_support'] = \
         #    x_['rnaseq_alt_support'].fillna(data=pd.Series(mv), index=x_.index)
         x_['rnaseq_alt_support'] = x_['rnaseq_alt_support'].fillna(value=pd.Series(mv)) # (, index=x_.index)
-        
+
         return x_
 
     def normalize(self, x_):
+        if self.normalizer is None:
+            return x_
+
         for i, c in enumerate(x_.columns):
             if is_cont_type(x_[c].dtype.name):
                 if type(self.normalizer) is dict:
