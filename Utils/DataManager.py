@@ -1,10 +1,11 @@
 import logging
+import os
 import random
 import numpy as np
 import pandas as pd
 from pandas.core.dtypes.concat import union_categoricals
 
-from DataWrangling.CatEncoder import CatEncoder
+#from DataWrangling.CatEncoder import CatEncoder
 from DataWrangling.MLRowSelection import MLRowSelection
 from DataWrangling.DataTransformer import DataTransformer
 from Utils.GlobalParameters import *
@@ -371,6 +372,8 @@ class DataManager:
                     combined_X = pd.concat([combined_X, X_p], ignore_index=True)
                 combined_y = np.append(combined_y, y_p)
         print("Extracted {0} out of {1} records for all patients".format(len(combined_df), len(data)))
+        in_X = combined_X.copy()
+        in_y = combined_y.copy()
         #if GlobalParameters.normalizer == '1' and data_transformer.objective == 'ml':
         if isopath and data_transformer.objective == 'ml':
             if peptide_type == 'mutation':
@@ -384,27 +387,21 @@ class DataManager:
             train_y = combined_y[(combined_df['train_test'] == 'train')]
             logging.info(F'Selected {len(train_y)} out of {len(combined_y)} rows. ')
 
-            import os, sys
+            import sys
             ISO_DIR = os.path.dirname(isopath)
             ISO_NAME = os.path.basename(isopath)
             ISO_MODULE, ISO_EXT = os.path.splitext(ISO_NAME)
-            # TODO: please change this to the directory that contains the IsotonicLogisticRegression python module
-            #   (for example, os.path.dirname(os.path.realpath(__file__))+(os.path.sep)+'..')
-            # ISO_DIR = '/mnt/d/code/neoguider' # LINE_TO_BE_CHANGED_A
             sys.path.append(ISO_DIR)
             IsotonicLogisticRegression = __import__(ISO_MODULE)
-            #from IsotonicLogisticRegression import IsotonicLogisticRegression
             os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.${peptide_type}.{ISO_NAME}.py')
             ilr = IsotonicLogisticRegression.IsotonicLogisticRegression()
             logging.info(F'Start fitting ILR')
             ilr.fit(train_X, train_y) # is_centered=True, is_log=True
             logging.info(F'End fitting ILR')
-            print(all_X)
-            print(train_X)
             trans_X = ilr.transform(all_X)
             trans_X = pd.DataFrame(data = trans_X, columns = all_X.columns)
             for ml_feature in ml_features: combined_X.loc[:,ml_feature] = trans_X[ml_feature]
-        return combined_df, combined_X, combined_y
+        return combined_df, combined_X, combined_y, in_X, in_y
 
     @staticmethod
     def transform_data(peptide_type: str, dataset: str, objective: str, isopath: str, seed: int) -> None:
@@ -420,10 +417,17 @@ class DataManager:
 
         """
         data_transformer = DataTransformer(peptide_type, objective, dataset, DataTransformer.get_normalizer(objective, seed))
-        data, X, y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, isopath=isopath)
+        data, X, y, in_X, in_y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, isopath=isopath)
         ml_sel_data_file_name, norm_data_file_name = DataManager._get_processed_data_files(peptide_type, objective)
         X.to_csv(norm_data_file_name, sep='\t', header=True, index=False)
         data.to_csv(ml_sel_data_file_name, sep='\t', header=True, index=False)
+
+        if objective == 'ml':
+            print(F'ml_sel_data_file_name, norm_data_file_name = ({ml_sel_data_file_name}, {norm_data_file_name}) # objective={objective}')
+            ml_sel_data_file_prefname, ml_sel_data_file_extname = os.path.splitext(norm_data_file_name)
+            in_y = pd.DataFrame({'Immunogenic': in_y})
+            in_X.to_csv(ml_sel_data_file_prefname + '.input_X.tsv.gz', sep='\t', header=True, index=False, compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
+            in_y.to_csv(ml_sel_data_file_prefname + '.input_y.tsv.gz', sep='\t', header=True, index=False, compression={'method': 'gzip', 'compresslevel': 1, 'mtime': 1})
 
     @staticmethod
     def select_ml_data(peptide_type: str) -> None:
