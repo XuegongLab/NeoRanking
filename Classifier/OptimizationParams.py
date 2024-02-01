@@ -75,7 +75,7 @@ class OptimizationParams:
         elif classifier_tag == "LR":
 
             parameter_space = {
-                'penalty': hp.choice('penalty', [None, 'l1', 'l2']),
+                'penalty': hp.choice('penalty', ['l1', 'l2']),
                 'C': hp.uniform('C', 0.0, 5.0),
                 'class_weight': self.get_class_weights()
             }
@@ -135,7 +135,7 @@ class OptimizationParams:
 
         elif classifier_tag == "LR":
             return LogisticRegression(solver='saga',  penalty=params['penalty'], C=params['C'],
-                                      class_weight=params['class_weight'])
+                                      class_weight=params['class_weight'], random_state=classifier_creation_seed, max_iter=1000)
 
         elif classifier_tag == "CatBoost":
             return CatBoostClassifier(
@@ -200,7 +200,7 @@ class OptimizationParams:
             return SVC(probability=True, kernel='linear')
 
         elif classifier_tag == "LR":
-            return LogisticRegression(solver='saga')
+            return LogisticRegression(solver='saga', random_state=classifier_creation_seed, max_iter=1000)
 
         elif classifier_tag == "CatBoost":
             cb = CatBoostClassifier(
