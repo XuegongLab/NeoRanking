@@ -25,7 +25,7 @@ class CatEncoder:
         self.nr_classes = 0
         return
 
-    def fit(self, x, y):
+    def fit(self, x, y, isopath, peptide_type):
         pos_cnt = Counter([x_sel for x_sel, y_sel in zip(x, y) if y_sel == 1])
         tot_cnt = Counter(x)
 
@@ -45,11 +45,21 @@ class CatEncoder:
 
             for l in tot_cnt:
                 self.float_encoding[l] /= s
-
-            #ilr = IsotonicLogisticRegression()
-            #k2v = ilr.encode1d(x, y)
-            #for l in k2v:
-            #    self.float_encoding[l] = k2v[l]
+            
+            if isopath:
+                import sys
+                ISO_DIR = os.path.dirname(isopath)
+                ISO_NAME = os.path.basename(isopath)
+                ISO_MODULE, ISO_EXT = os.path.splitext(ISO_NAME)
+                sys.path.append(ISO_DIR)
+                IsotonicLogisticRegression = __import__(ISO_MODULE)
+                os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.{peptide_type}.{ISO_NAME}.encode1d.py')
+                ilr = IsotonicLogisticRegression.IsotonicLogisticRegression()
+                if hasattr(ilr, 'encode1d'):
+                    k2v = ilr.encode1d(x, y)
+                    for l in k2v:
+                        self.float_encoding[l] = k2v[l]
+                else: warnings.warn(F'The module {isopath} does not have the method encode1d, so categorical encoding with {isopath} is skipped. ')
 
             self.unknown_float_code = 0.0
 

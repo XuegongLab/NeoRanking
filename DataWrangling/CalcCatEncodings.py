@@ -17,9 +17,12 @@ parser.add_argument('-pt', '--peptide_type', type=str, choices=GlobalParameters.
                     help='Peptide type (mutation  or neopep)')
 parser.add_argument('-ds', '--dataset', type=str, choices=GlobalParameters.datasets_encoding,
                     help='Dataset used for encoding (NCI_train or NCI)')
+parser.add_argument('-i', '--isopath', type=str, default='',
+                    help='Path to the IsotonicLogisticRegression module')
 
 if __name__ == "__main__":
     args = parser.parse_args()
+    if args.isopath.lower() in ['.', 'na', 'n/a', 'n.a', 'n.a.']: args.isopath = ''
     # GlobalParameters has predefined filenames for NCI and NCI_train datasets
     with open(GlobalParameters.get_cat_to_num_info_file(args.dataset, args.peptide_type), mode='w') \
             as encoding_file:
@@ -41,5 +44,5 @@ if __name__ == "__main__":
             if f in ml_features and (data_train[f].dtype.name == 'category' or data_train[f].dtype == bool):
                 print("Encoding feature {0} ...".format(f))
                 l_enc = CatEncoder(f)
-                l_enc.fit(data_train[f].values, y)
+                l_enc.fit(data_train[f].values, y, args.isopath, args.peptide_type)
                 l_enc.append_to_file(encoding_file)
