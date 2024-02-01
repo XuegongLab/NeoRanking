@@ -8,7 +8,7 @@ from sklearn.preprocessing import QuantileTransformer, StandardScaler, PowerTran
 
 from Utils.GlobalParameters import GlobalParameters
 from Utils.Util_fct import *
-from DataWrangling.CatEncoder import CatEncoder
+#from DataWrangling.CatEncoder import CatEncoder
 
 
 class MLRowSelection:
