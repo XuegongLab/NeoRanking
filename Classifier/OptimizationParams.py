@@ -135,7 +135,7 @@ class OptimizationParams:
 
         elif classifier_tag == "LR":
             return LogisticRegression(solver='saga',  penalty=params['penalty'], C=params['C'],
-                                      class_weight=params['class_weight'], random_state=classifier_creation_seed, max_iter=1000)
+                                      class_weight=params['class_weight'], random_state=classifier_creation_seed)
 
         elif classifier_tag == "CatBoost":
             return CatBoostClassifier(
