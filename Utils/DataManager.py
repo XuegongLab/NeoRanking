@@ -395,9 +395,9 @@ class DataManager:
             IsotonicLogisticRegression = __import__(ISO_MODULE)
             os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.${peptide_type}.{ISO_NAME}.py')
             ilr = IsotonicLogisticRegression.IsotonicLogisticRegression()
-            logging.info(F'Start fitting ILR')
+            logging.info(F'Start fitting the encoder at {isopath}')
             ilr.fit(train_X, train_y) # is_centered=True, is_log=True
-            logging.info(F'End fitting ILR')
+            logging.info(F'End fitting the encoder')
             trans_X = ilr.transform(all_X)
             trans_X = pd.DataFrame(data = trans_X, columns = all_X.columns)
             for ml_feature in ml_features: combined_X.loc[:,ml_feature] = trans_X[ml_feature]
