@@ -200,7 +200,7 @@ class OptimizationParams:
             return SVC(probability=True, kernel='linear')
 
         elif classifier_tag == "LR":
-            return LogisticRegression(solver='saga', random_state=classifier_creation_seed, max_iter=1000)
+            return LogisticRegression(solver='saga', random_state=classifier_creation_seed)
 
         elif classifier_tag == "CatBoost":
             cb = CatBoostClassifier(
