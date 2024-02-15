@@ -24,18 +24,18 @@ class DataTransformer:
 
         return
 
-    def apply(self, data: pd.DataFrame, isopath: str) -> list:
+    def apply(self, data: pd.DataFrame) -> list:
         if data is None or data.shape[0] == 0:
             return None, None, None
 
         if self.peptide_type == 'mutation':
-            return self.load_patient_mutation(data, isopath)
+            return self.load_patient_mutation(data)
         elif self.peptide_type == 'neopep':
-            return self.load_patient_neopep(data, isopath)
+            return self.load_patient_neopep(data)
         else:
             return None, None, None
 
-    def load_patient_mutation(self, df, isopath: str):
+    def load_patient_mutation(self, df):
         if df.shape[0] == 0:
             return None, None, None
 
@@ -48,7 +48,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        if not isopath or self.objective != 'ml': X = self.normalize(X)
+        X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)

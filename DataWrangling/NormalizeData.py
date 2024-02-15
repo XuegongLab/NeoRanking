@@ -13,14 +13,18 @@ parser.add_argument('-ds', '--dataset', type=str, choices=GlobalParameters.datas
                     help='Dataset used for encoding (NCI_train or NCI)')
 parser.add_argument('-o', '--objective', type=str, choices=GlobalParameters.objectives,
                     help='Objective for normalization (ml or plot)')
+parser.add_argument('-c', '--catpath', type=str,
+                    help='Path to the category encoder python source-code file. ')
 parser.add_argument('-i', '--isopath', type=str,
                     help='Path to the isotonic regression python source-code file. ')
 parser.add_argument('-s', '--seed', type=int, default=42,
                     help='Pseudo-random number generator (PRNG) seed. ')
 
 if __name__ == "__main__":
+    NA_REPS = ['.', 'na', 'n/a', 'n.a', 'n.a.']
     args = parser.parse_args()
-    if args.isopath.lower() in ['.', 'na', 'n/a', 'n.a', 'n.a.']: args.isopath = ''
+    if args.catpath.lower() in NA_REPS: args.catpath = ''
+    if args.isopath.lower() in NA_REPS: args.isopath = ''
     print(args)
-    DataManager.transform_data(args.peptide_type, args.dataset, args.objective, args.isopath, args.seed)
+    DataManager.transform_data(args.peptide_type, args.dataset, args.objective, args.catpath, args.isopath, args.seed)
 

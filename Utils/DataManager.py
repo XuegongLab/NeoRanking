@@ -349,7 +349,7 @@ class DataManager:
         return patient in DataManager._immunogenic_patients[peptide_type]
 
     @staticmethod
-    def _transform_data_(peptide_type: str, data_transformer: DataTransformer, isopath: str) \
+    def _transform_data_(peptide_type: str, data_transformer: DataTransformer, catpath: str, isopath: str, seed: int) \
             -> pd.DataFrame:
         data = DataManager.load_ml_selected_data(peptide_type=peptide_type)
         patients = data['patient'].unique()
@@ -358,7 +358,7 @@ class DataManager:
             #print("processing patient {0}".format(p))
             data_p = \
                 DataManager.load_filter_data(peptide_type=peptide_type, patient=p, ml_row_selection=True)
-            data_p, X_p, y_p = data_transformer.apply(data_p, isopath)
+            data_p, X_p, y_p = data_transformer.apply(data_p)
             print("Extracted {0} out of {1} records for patient {2}".format(len(data_p), len(data), p))
             if i == 0:
                 combined_df = data_p
@@ -375,36 +375,63 @@ class DataManager:
         in_X = combined_X.copy()
         in_y = combined_y.copy()
         #if GlobalParameters.normalizer == '1' and data_transformer.objective == 'ml':
-        if isopath and data_transformer.objective == 'ml':
+        
+        is_proc_by_cat = (catpath and data_transformer.objective == 'ml')
+        is_proc_by_iso = (isopath and data_transformer.objective == 'ml')
+        if is_proc_by_cat or is_proc_by_iso:
+            types = GlobalParameters.feature_types_neopep if peptide_type == 'neopep' \
+                else GlobalParameters.feature_types_mutation
             if peptide_type == 'mutation':
                 ml_features = GlobalParameters.ml_features_mutation
             elif peptide_type == 'neopep':
                 ml_features = GlobalParameters.ml_features_neopep
 
             all_X = combined_X.loc[:,ml_features]
-            train_X = combined_X.loc[(combined_df['train_test'] == 'train'),ml_features]
-            logging.info(F'Selected {len(train_X)} out of {len(all_X)} rows. ')
-            train_y = combined_y[(combined_df['train_test'] == 'train')]
+            are_train_bool_vec = (combined_df['train_test'] == 'train')
+            train_X = combined_X.loc[are_train_bool_vec,ml_features]
+            train_y = combined_y[are_train_bool_vec]
             logging.info(F'Selected {len(train_y)} out of {len(combined_y)} rows. ')
-
+            assert len(train_X) == len(train_y)
             import sys
+
+        if is_proc_by_cat:
+                        
+            CAT_DIR = os.path.dirname(catpath)
+            CAT_NAME = os.path.basename(catpath)
+            CAT_MODULE, CAT_EXT = os.path.splitext(CAT_NAME)
+            sys.path.append(CAT_DIR)            
+            os.system(F'cp {catpath} {GlobalParameters.neopep_data_ml_sel_file}.{peptide_type}.{CAT_NAME}')
+            encoder = __import__(CAT_MODULE).TargetEncoder(random_state=seed)
+            logging.info(F'Start fitting the encoder at {catpath}')
+            cols = []
+            for i, c in enumerate(all_X.columns):
+                if is_cat_type(types[c]) or types[c] == 'bool':
+                    cols.append(c)
+            encoder.fit(all_X.loc[ are_train_bool_vec, cols], train_y)
+            all_X.loc[ are_train_bool_vec, cols] = encoder.transform(all_X.loc[ are_train_bool_vec, cols], True)  #.flatten()
+            all_X.loc[~are_train_bool_vec, cols] = encoder.transform(all_X.loc[~are_train_bool_vec, cols], False) #.flatten()
+            logging.info(F'End fitting the encoder')
+
+        if is_proc_by_iso:
+            
             ISO_DIR = os.path.dirname(isopath)
             ISO_NAME = os.path.basename(isopath)
             ISO_MODULE, ISO_EXT = os.path.splitext(ISO_NAME)
             sys.path.append(ISO_DIR)
-            IsotonicLogisticRegression = __import__(ISO_MODULE)
-            os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.${peptide_type}.{ISO_NAME}.py')
-            ilr = IsotonicLogisticRegression.IsotonicLogisticRegression()
-            logging.info(F'Start fitting the encoder at {isopath}')
+            os.system(F'cp {isopath} {GlobalParameters.neopep_data_ml_sel_file}.${peptide_type}.{ISO_NAME}')
+            ilr = __import__(ISO_MODULE).IsotonicLogisticRegression(random_state=seed)
+            logging.info(F'Start fitting the feature transformer at {isopath}')
             ilr.fit(train_X, train_y) # is_centered=True, is_log=True
-            logging.info(F'End fitting the encoder')
-            trans_X = ilr.transform(all_X)
-            trans_X = pd.DataFrame(data = trans_X, columns = all_X.columns)
-            for ml_feature in ml_features: combined_X.loc[:,ml_feature] = trans_X[ml_feature]
+            logging.info(F'End fitting the feature transformer')
+            all_X.loc[ are_train_bool_vec, :] = ilr.transform(all_X.loc[ are_train_bool_vec, :], True)
+            all_X.loc[~are_train_bool_vec, :] = ilr.transform(all_X.loc[~are_train_bool_vec, :], False)
+        
+        if is_proc_by_cat or is_proc_by_iso:
+            combined_X.loc[:,ml_features] = all_X.loc[:,ml_features]
         return combined_df, combined_X, combined_y, in_X, in_y
 
     @staticmethod
-    def transform_data(peptide_type: str, dataset: str, objective: str, isopath: str, seed: int) -> None:
+    def transform_data(peptide_type: str, dataset: str, objective: str, catpath: str, isopath: str, seed: int) -> None:
         """
         Transforms data by encoding categorical values, normalizing numerical values, and imputing missing values.
         These operations are performed separately for each patient in all datasets. Stores the transformed data matrix
@@ -417,7 +444,7 @@ class DataManager:
 
         """
         data_transformer = DataTransformer(peptide_type, objective, dataset, DataTransformer.get_normalizer(objective, seed))
-        data, X, y, in_X, in_y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, isopath=isopath)
+        data, X, y, in_X, in_y = DataManager._transform_data_(peptide_type=peptide_type, data_transformer=data_transformer, catpath=catpath, isopath=isopath, seed=seed)
         ml_sel_data_file_name, norm_data_file_name = DataManager._get_processed_data_files(peptide_type, objective)
         X.to_csv(norm_data_file_name, sep='\t', header=True, index=False)
         data.to_csv(ml_sel_data_file_name, sep='\t', header=True, index=False)
