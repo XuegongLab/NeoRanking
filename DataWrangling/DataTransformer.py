@@ -57,7 +57,7 @@ class DataTransformer:
 
         return df, X, y
 
-    def load_patient_neopep(self, df, isopath: str):
+    def load_patient_neopep(self, df):
         if df.shape[0] == 0:
             return None, None, None
 
@@ -70,7 +70,7 @@ class DataTransformer:
         if self.objective == 'ml':
             X = self.fill_missing_values(X)
 
-        if not isopath or self.objective != 'ml': X = self.normalize(X)
+        X = self.normalize(X)
 
         if self.objective == 'ml':
             X = self.encode_cat_features(X)
