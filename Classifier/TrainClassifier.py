@@ -7,6 +7,8 @@ from DataWrangling.DataTransformer import *
 from Classifier.ClassifierManager import *
 from Utils.Util_fct import *
 
+NA_REPS = ['.', 'na', 'n/a', 'n.a', 'n.a.', '']
+
 parser = argparse.ArgumentParser(description='Add features to neodisc files')
 parser.add_argument('-c', '--classifier', type=str, default='LR', choices=GlobalParameters.classifiers,
                     help='classifier to use')
@@ -17,7 +19,7 @@ parser.add_argument('-pt', '--peptide_type', type=str, choices=GlobalParameters.
                     help='Peptide type (mutation  or neopep)')
 parser.add_argument('-tag', '--run_tag', type=str, help='Tag used in output file')
 parser.add_argument('-s', '--seed', type=int, default=42, help='Seed for pseudo-random number generator')
-
+parser.add_argument('-a', '--additional-tag', type=str, default='', help='Additional tag other than CD8 and negative to select training data (for example, not_tested)')
 
 def run_training(run_index):
     clf_model_file = get_classifier_file(args.classifier, args.sub_dir, args.run_tag, run_index, args.peptide_type)
@@ -49,6 +51,7 @@ def run_training(run_index):
             response_types = ['CD8', 'negative']
         else:
             response_types = ['CD8', 'negative', 'not_tested']
+        if (not (args.additional_tag in NA_REPS)) and (not (args.additional_tag in response_types)): response_types.append(args.additional_tag)
 
         data_train, X_train, y_train = \
             DataManager.filter_processed_data(peptide_type=args.peptide_type, objective='ml',
