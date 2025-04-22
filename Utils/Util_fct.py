@@ -73,7 +73,7 @@ def get_classifier_file(clf_name, sub_dir, run_tag, run_idx, peptide_type):
     file_dir = os.path.join(GlobalParameters.classifier_model_dir, sub_dir)
 
     date_time_str = datetime.datetime.now().strftime("%m.%d.%Y-%H.%M.%S")
-    if clf_name in ['LR', 'SVM', 'SVM-lin']:
+    if clf_name in ['LR', 'SVM', 'SVM-lin', 'MLP2L']:
         ext = 'sav'
     elif clf_name == 'XGBoost':
         ext = 'xgbm'

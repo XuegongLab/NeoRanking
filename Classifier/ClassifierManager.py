@@ -32,7 +32,7 @@ class ClassifierManager:
         """
         Class for training and testing of classifiers
         Args:
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
             scorer_name (str): name of scoring function for hyperopt optimization ('sum_exp_rank',
                                'nr_correct_top100', 'sum_prob_top100')
             optimization_params (OptimizationParams): OptimizationParams object
@@ -56,7 +56,7 @@ class ClassifierManager:
 
     def optimize_classifier(self, data: pd.DataFrame, x: pd.DataFrame, y: np.ndarray, report_file: str = None) -> tuple:
         """
-        Performs Hyperopt search for 'SVM', 'SVM-lin', 'LR', 'XGBoost', and 'CatBoost' classifiers
+        Performs Hyperopt search for 'SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost' and 'MLP2L' (MLP with two hidden layers) classifiers
 
         Args:
             data (pd.DataFrame): unprocessed dataframe with rows selected for ML
@@ -74,7 +74,7 @@ class ClassifierManager:
         self._classifier_scorer = self._optimization_params.get_scorer(self._scorer_name, data)
         param_space = self._optimization_params.get_param_space(self._classifier_tag)
 
-        if self._classifier_tag in ['SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost']:
+        if self._classifier_tag in ['SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L']:
 
             random.seed(self._seed+3)
             np.random.seed(self._seed+2)
@@ -335,7 +335,7 @@ class ClassifierManager:
         """
         Saves classifier to file.
         Args:
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
             classifier (object): classifier to be fitted. Classifier object must implement the sklearn fit
                                  method
             classifier_file (str): file name of classifier model file
@@ -363,7 +363,7 @@ class ClassifierManager:
         """
         Saves classifier to file.
         Args:
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
             optimization_params (OptimizationParams): OptimizationParams object
             classifier_file (str): file name of classifier model file
         Returns:

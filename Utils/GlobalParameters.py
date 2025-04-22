@@ -2,6 +2,21 @@ import os
 import os.path
 from typing import Final
 
+import sklearn
+from sklearn.neural_network import MLPClassifier
+
+class MLPClassifierWithOneLayer(MLPClassifier):
+    def __init__(self, **kwargs):
+        n1 = kwargs.get('n1', 100)
+        if 'n1' in kwargs: kwargs.pop('n1')
+        super().__init__((n1,), **kwargs)
+class MLPClassifierWithTwoLayers(MLPClassifier):
+    def __init__(self, **kwargs):
+        n1 = kwargs.get('n1', 100)
+        n2 = kwargs.get('n2', 100)
+        if 'n1' in kwargs: kwargs.pop('n1')
+        if 'n2' in kwargs: kwargs.pop('n2')
+        super().__init__((n1,n2,), **kwargs)
 
 class GlobalParameters:
     """
@@ -102,7 +117,7 @@ class GlobalParameters:
     aas: Final[list] = \
         ['A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y']
 
-    classifiers = ['SVM', 'SVM-lin', 'RF', 'CART', 'ADA', 'LR', 'NNN', 'XGBoost']
+    classifiers = ['SVM', 'SVM-lin', 'RF', 'CART', 'ADA', 'LR', 'NNN', 'XGBoost', 'MLP2L']
     neopep_alpha: Final[float] = 0.005
     mutation_alpha: Final[float] = 0.05
     nr_hyperopt_rep = 10

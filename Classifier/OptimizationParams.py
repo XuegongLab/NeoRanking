@@ -13,7 +13,7 @@ from hyperopt import hp
 from hyperopt.pyll import scope
 
 from Utils.GlobalParameters import GlobalParameters
-
+from Utils.GlobalParameters import MLPClassifierWithTwoLayers
 
 class OptimizationParams:
 
@@ -53,7 +53,7 @@ class OptimizationParams:
         Defines parameter space searched durich Hyperopt loop for each classifier
 
         Args:
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
         Returns:
             parameter_space (dict): dictionary with parameter space for each classifier hyperparameter used in the
             Hyperopt loop
@@ -112,7 +112,14 @@ class OptimizationParams:
                 'depth': scope.int(hp.quniform('depth', 5, 10, 1)),
                 'bagging_temperature': hp.uniform('bagging_temperature', 0.0, 1.0)
             }
+        elif classifier_tag == "MLP2L":
 
+            parameter_space = {
+                'n1': scope.int(hp.quniform('n1', 1, 100, 1)),
+                'n2': scope.int(hp.quniform('n2', 1, 10, 1)),
+                'alpha': hp.loguniform('alpha', np.log(0.0001/10), np.log(0.0001*10))
+            }
+        print(F'classifier_tag=={classifier_tag} with parameter_space={parameter_space}')
         return parameter_space
 
     def get_classifier(self, classifier_tag: str, params: dict, classifier_creation_seed: int = 0):
@@ -120,7 +127,7 @@ class OptimizationParams:
         Creates classifier object with hyperparameters corresponding to params
 
         Args:
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
             params (dict): dictionary with parameter values for classifier specified in classifier_tag
         Returns:
             classifier object (Object): classifier object with hyperparameters corresponding to params
@@ -182,6 +189,12 @@ class OptimizationParams:
                 base_score=0.5,
                 random_state=classifier_creation_seed,
                 seed=classifier_creation_seed)
+        elif classifier_tag == 'MLP2L':
+            return MLPClassifierWithTwoLayers(
+                n1=params['n1'],
+                n2=params['n2'],
+                alpha = params['alpha'],
+                random_state=classifier_creation_seed)
 
     def get_base_classifier(self, classifier_tag, classifier_creation_seed: int = 0):
         """
@@ -243,6 +256,9 @@ class OptimizationParams:
                 random_state=classifier_creation_seed,
                 seed=classifier_creation_seed) # from seed=None
             return clf_xgb
+        elif classifier_tag == 'MLP2L':
+            clf_mlp2l = MLPClassifierWithTwoLayers()
+            return clf_mlp2l
 
     def get_scorer(self, scorer_name: str, data: pd.DataFrame):
         """
@@ -327,7 +343,7 @@ class OptimizationObjective:
 
         Args:
             optimization_params (OptimizationParams): OptimizationParams object
-            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost')
+            classifier_tag (str): tag of classifier ('SVM', 'SVM-lin', 'LR', 'XGBoost', 'CatBoost', 'MLP2L')
             x (pd.DataFrame): processed dataframe with rows and columns selected for ML
             y (np.ndarray): 0/1 array indicating immunogenicity (value == 1)
             shuffle (bool): shuffle dataframe before training
@@ -358,7 +374,7 @@ class OptimizationObjective:
         """
         classifier = self.optimization_params.get_classifier(self.classifier_tag, params)
 
-        if self.classifier_tag in ['SVM', 'SVM-lin', 'LR', 'XGBoost']:
+        if self.classifier_tag in ['SVM', 'SVM-lin', 'LR', 'XGBoost', 'MLP2L']:
             # cross_val_score calls the metric function with arguments self.metric(self.y, classifier.predict(self.X))
             loss = 1 - \
                    cross_val_score(classifier, self.X, self.y, cv=self.stratifiedKFold, scoring=self.metric).mean()
@@ -389,4 +405,7 @@ class OptimizationObjective:
 
             return loss
 
+        else:
+            print(F'Error: the classifier_tag {self.classifier_tag} is not recognized! ')
+            exit(-1)
 

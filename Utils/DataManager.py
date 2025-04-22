@@ -408,7 +408,8 @@ class DataManager:
                 if is_cat_type(types[c]) or types[c] == 'bool':
                     cols.append(c)
             encoder.fit(all_X.loc[ are_train_bool_vec, cols], train_y)
-            all_X.loc[ are_train_bool_vec, cols] = encoder.transform(all_X.loc[ are_train_bool_vec, cols], True)  #.flatten()
+            #all_X.loc[ are_train_bool_vec, cols] = encoder.transform(all_X.loc[ are_train_bool_vec, cols], True) #.flatten()
+            all_X.loc[ are_train_bool_vec, cols] = encoder.transform(all_X.loc[ are_train_bool_vec, cols], False) #.flatten()
             all_X.loc[~are_train_bool_vec, cols] = encoder.transform(all_X.loc[~are_train_bool_vec, cols], False) #.flatten()
             logging.info(F'End fitting the encoder')
 
